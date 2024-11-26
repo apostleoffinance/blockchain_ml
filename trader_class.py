@@ -1,4 +1,3 @@
-# %%
 from flipside import Flipside
 import requests
 import pandas as pd
@@ -14,14 +13,12 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.metrics import roc_curve, roc_auc_score
 
-# %%
 load_dotenv()
 flipside_api_key = os.getenv("FLIPSIDE_API_KEY") # or can use api key directly
 #flipside = os.getenv("FLIPSIDE_API_KEY") # or can use api key directly
 #print(flipside)
 print(flipside_api_key)
 
-# %%
 def flipside_api_results(query, api_key, attempts=10, delay=30):
     """
     Creates and retrieves results for a query using Flipside's JSON-RPC API with pagination.
@@ -435,7 +432,6 @@ df = flipside_api_results(sql,flipside_api_key)
 df.drop(columns='__row_index',inplace=True)
 df
 
-# %%
 # Convert 'day' column to datetime format and remove time component 
 df['day'] = pd.to_datetime(df['day'], errors='coerce').dt.date
 #Remove later
@@ -467,7 +463,6 @@ print(df_cleaned.isna().sum())
 df_cleaned['day'] = pd.to_datetime(df_cleaned['day'])
 
 
-# %%
 # Convert 'trader_class' to a categorical column
 df_cleaned["trader_class"] = df_cleaned["trader_class"].astype('category')
 df_cleaned["trader_class"].cat.categories
@@ -483,7 +478,6 @@ df_cleaned.columns
 numeric = df_cleaned.select_dtypes(include=['number'])
 #numeric
 
-# %%
 features = ['base_cumulative_return', 'portfolio_return', 
             'daily_sharpe_ratio', 'number_of_trades', 'unique_tokens_traded']
 
