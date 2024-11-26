@@ -1,4 +1,5 @@
 
+from flipside import Flipside
 import requests
 import numpy as np
 import pandas as pd
@@ -111,15 +112,16 @@ def flipside_api_results(query, api_key, attempts=10, delay=30):
             # Convert the rows to a DataFrame
             return pd.DataFrame(all_rows)
 
-        if 'error' in resp_json and 'not yet completed' in resp_json['error'].get('message', '').lower():
+        # Handle the specific "QueryRunNotFinished" case
+        if 'error' in resp_json and resp_json['error']['message'] == "QueryRunNotFinished: The query run has not yet completed.":
+            print(f"Attempt {attempt + 1}/{attempts}: Query not yet finished. Retrying after {delay} seconds...")
             time.sleep(delay)  # Wait before retrying
         else:
             raise Exception(f"Unexpected error while fetching query results: {resp_json}")
 
     raise TimeoutError(f"Query did not complete after {attempts} attempts.")
 
-
-query = """WITH RECURSIVE date_series AS (
+sql = """WITH RECURSIVE date_series AS (
   SELECT
     '2024-02-01' :: DATE AS day
   UNION
@@ -425,7 +427,7 @@ FROM
 """
 """Run the query against Flipside's query engine and await the results"""
 
-df = flipside_api_results(query,flipside_api_key)
+df = flipside_api_results(sql,flipside_api_key)
 
 df.drop(columns='__row_index',inplace=True)
 
@@ -446,7 +448,7 @@ def remove_outliers_iqr(df, column):
 df_clean = remove_outliers_iqr(df, 'portfolio_return')
 
 # Check for NaN values in the entire DataFrame
-print(df_clean.isna().sum())
+#print(df_clean.isna().sum())
 
 #drop rows in trader_class column with NaN values
 df_cleann = df_clean.dropna(subset=['trader_class'])
@@ -454,7 +456,7 @@ df_cleann = df_clean.dropna(subset=['trader_class'])
 
 #Fill NaN with 0
 df_cleaned = df_cleann.fillna(0)
-print(df_cleaned.isna().sum())
+#print(df_cleaned.isna().sum())
 
 
 #convert day to datetime
@@ -468,7 +470,7 @@ df_cleaned["trader_class"].cat.categories
 
 # Assign unique integers to categories
 df_cleaned['trader_class_numeric'] = df_cleaned['trader_class'].astype('category').cat.codes
-df_cleaned['trader_class_numeric']
+#df_cleaned['trader_class_numeric']
 
 
  # Correlation Coefficient Analysis
