@@ -509,7 +509,9 @@ log_reg.fit(X_train, y_train)
 
 #predict on the test set
 y_pred = log_reg.predict(X_test)
-y_pred
+
+# Model Accuracy, how often is the classifier correct?
+print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
 
 
 
